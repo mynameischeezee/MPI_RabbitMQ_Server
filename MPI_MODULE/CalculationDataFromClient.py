@@ -1,18 +1,36 @@
+import numpy
+import numpy as numpy
 from mpi4py import MPI
 from random import randint
 import sys
+import numpy
+import os
+from environs import Env
 
-from Server.MatrixMultiplication import matrix_multiplication
+strMatrixA = ""
+strMatrixB = ""
+
+with open("../matrixA.txt", "r") as f:
+    strMatrixA = f.read()
+
+with open("../matrixB.txt", "r") as f:
+    strMatrixB = f.read()
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 workers = comm.Get_size() - 1
 CONST_MASTER_RANK = 0
 MatrixDimension = int(sys.argv[1])
-MatrixA = [[randint(0, 9) for i in range(MatrixDimension)] for j in range(MatrixDimension)]
-MatrixB = [[randint(0, 9) for i in range(MatrixDimension)] for j in range(MatrixDimension)]
+MatrixA = numpy.reshape(list(map(int, strMatrixA.split(','))), (MatrixDimension, MatrixDimension))
+MatrixB = numpy.reshape(list(map(int, strMatrixB.split(','))), (MatrixDimension, MatrixDimension))
 ResultMatrix = []
 Buffer = MatrixDimension * 5000
+
+
+def matrix_multiplication(x, y):
+    return [[sum(a * b for a, b in zip(X_row, Y_col)) for Y_col in zip(*y)]
+            for X_row in x]
+
 
 def distribute_matrix_data():
     def split_matrix(input_matrix, amount_of_workers):
@@ -69,9 +87,9 @@ def slave_operation():
     print("[!] slave process with #%d finished in: %5.10fs." % (rank, spent_time))
 
 
-def calculate(dimension, matrixA, matrixB):
-
+if __name__ == "__main__":
     if rank == CONST_MASTER_RANK:
         master_operation()
     else:
         slave_operation()
+
