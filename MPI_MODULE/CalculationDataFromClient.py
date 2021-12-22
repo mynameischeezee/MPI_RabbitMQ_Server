@@ -6,6 +6,7 @@ import sys
 import numpy
 import os
 from environs import Env
+from Sender import *
 
 strMatrixA = ""
 strMatrixB = ""
@@ -72,6 +73,7 @@ def master_operation():
     get_matrix_data()
     time_spent = MPI.Wtime() - time_start
     print("[!] master process with #%d finished in: %5.10fs." % (rank, time_spent))
+    Send(ResultMatrix)
 
 
 def slave_operation():
@@ -85,6 +87,7 @@ def slave_operation():
     req_send.wait()
     spent_time = MPI.Wtime() - time_start
     print("[!] slave process with #%d finished in: %5.10fs." % (rank, spent_time))
+
 
 
 if __name__ == "__main__":

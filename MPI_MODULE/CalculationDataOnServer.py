@@ -1,5 +1,7 @@
+import pika
 from mpi4py import MPI
 from random import randint
+from Sender import *
 import sys
 
 comm = MPI.COMM_WORLD
@@ -58,6 +60,7 @@ def master_operation():
     get_matrix_data()
     time_spent = MPI.Wtime() - time_start
     print("[!] master process with #%d finished in: %5.10fs." % (rank, time_spent))
+    Send(ResultMatrix)
 
 
 def slave_operation():
@@ -78,3 +81,4 @@ if __name__ == "__main__":
         master_operation()
     else:
         slave_operation()
+
